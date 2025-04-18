@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Nut Ranking</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 600px; margin: auto; }
+    button { margin: 0.5rem; padding: 0.5rem 1rem; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Rank Your Nuts</h1>
+  <div id="question"></div>
+  <button id="yesBtn">Yes ✅</button>
+  <button id="noBtn">No ❌</button>
+  <div id="result" style="display:none;"></div>
+
+  <script>
+    // 1. The list to rank:
+    const items = [
+      "almonds",
+      "Brazil nuts",
+      "cashew nuts",
+      "hazelnuts",
+      "macadamias",
+      "pecans",
+      "pine nuts",
+      "pistachios",
+      "walnuts",
+      "peanuts"
+    ];
+
+    // 2. State variables:
+    let ranking = [];
+    let currentItem = 0;
+    let compareIdx = 0;
+
+    const qDiv = document.getElementById('question');
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn  = document.getElementById('noBtn');
+    const resDiv = document.getElementById('result');
+
+    // 3. Show the next comparison or final result
+    function showQuestion() {
+      // If done with all items, display the ranking:
+      if (currentItem >= items.length) {
+        qDiv.style.display = yesBtn.style.display = noBtn.style.display = 'none';
+        resDiv.style.display = 'block';
+        resDiv.innerHTML = '<h2>Your final ranking:</h2><ol>' +
+          ranking.map(n => `<li>${n}</li>`).join('') +
+          '</ol>';
+        return;
+      }
+
+      // If this is the very first nut, just insert it without asking:
+      if (ranking.length === 0) {
+        ranking.push(items[currentItem]);
+        currentItem++;
+        return showQuestion();
+      }
+
+      // If we've compared this nut against everyone in ranking, append it:
+      if (compareIdx >= ranking.length) {
+        ranking.push(items[currentItem]);
+        currentItem++;
+        compareIdx = 0;
+        return showQuestion();
+      }
+
+      // Otherwise ask the next pairwise question:
+      qDiv.textContent = 
+        `Do you prefer **${items[currentItem]}** over **${ranking[compareIdx]}**?`;
+    }
+
+    // 4. Button handlers:
+    yesBtn.addEventListener('click', () => {
+      // Insert currentItem before ranking[compareIdx]
+      ranking.splice(compareIdx, 0, items[currentItem]);
+      currentItem++;
+      compareIdx = 0;
+      showQuestion();
+    });
+
+    noBtn.addEventListener('click', () => {
+      // Move on to compare with the next ranked nut
+      compareIdx++;
+      showQuestion();
+    });
+
+    // 5. Kick things off:
+    showQuestion();
+  </script>
+</body>
+</html>
